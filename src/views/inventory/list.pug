@@ -1,0 +1,40 @@
+extends ../layout
+
+block content
+  h2.mb-4 Control de Inventario
+  
+  .card.mb-4
+    .card-header
+      h3.h5.mb-0 Nuevo Insumo
+    .card-body
+      form.row.g-2(action='/inventory/supplies', method='POST')
+        .col-md-5
+          input.form-control(type='text', name='name', placeholder='Nombre (ej. Tomates)', required)
+        .col-md-3
+          input.form-control(type='number', name='quantity', placeholder='Cantidad', required, min='0')
+        .col-md-2
+          input.form-control(type='text', name='unit', placeholder='Unidad (kg, u)', required)
+        .col-md-2
+          button.btn.btn-primary.w-100(type='submit') Agregar
+
+  if insumos.length
+    table.table.table-striped.table-hover
+      thead
+        tr
+          th Insumo
+          th Cantidad
+          th Unidad
+          if user.role === 'admin'
+            th Acciones
+      tbody
+        each item in insumos
+          tr
+            td= item.name
+            td= item.quantity
+            td= item.unit
+            if user.role === 'admin'
+              td
+                form(action=`/inventory/supplies/${item.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Eliminar insumo?');")
+                  button.btn.btn-sm.btn-danger(type='submit') Eliminar
+  else
+    p.text-center.text-muted No hay insumos registrados.

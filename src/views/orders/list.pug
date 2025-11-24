@@ -1,0 +1,64 @@
+extends ../layout
+
+block content
+  h2.mb-4 Gestión de Pedidos
+  
+  .card.mb-4
+    .card-header
+      h3.h5.mb-0 Nuevo Pedido
+    .card-body
+      form(action='/orders', method='POST')
+        .row.mb-3
+          .col-md-6
+            label.form-label Cliente
+            input.form-control(type='text', name='clientName', placeholder='Nombre del Cliente', required)
+          .col-md-6
+            label.form-label Plataforma
+            select.form-select(name='platform', required)
+              option(value='Local') Local / Presencial
+              option(value='Telefono') Telefónico
+              option(value='Rappi') Rappi
+              option(value='PedidosYa') PedidosYa
+              option(value='Propia') App Propia
+        
+        .mb-3
+          label.form-label Productos / Detalle
+          textarea.form-control(name='products', rows='2', placeholder='Ej: 2 Hamburguesas completas, 1 Coca-Cola', required)
+
+        .row.mb-3
+          .col-md-4
+            label.form-label Total ($)
+            input.form-control(type='number', name='total', placeholder='0.00', required)
+          .col-md-8.d-flex.align-items-end
+            button.btn.btn-primary.w-100(type='submit') Registrar Pedido
+
+  if pedidos.length
+    .table-responsive
+      table.table.table-striped.table-hover
+        thead
+          tr
+            th Fecha
+            th Cliente
+            th Plataforma
+            th Detalle
+            th Total
+            th Estado
+            if user.role === 'admin'
+              th Acciones
+        tbody
+          each pedido in pedidos
+            tr
+              td= new Date(pedido.createdAt).toLocaleDateString()
+              td= pedido.clientName
+              td
+                span.badge.bg-secondary= pedido.platform
+              td= pedido.products
+              td= `$${pedido.total}`
+              td
+                span.badge(class=`bg-${pedido.status === 'pendiente' ? 'warning' : 'success'}`)= pedido.status
+              if user.role === 'admin'
+                td
+                  form(action=`/orders/${pedido.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Eliminar pedido?');")
+                    button.btn.btn-sm.btn-danger(type='submit') Eliminar
+  else
+    p.text-center.text-muted No hay pedidos registrados.

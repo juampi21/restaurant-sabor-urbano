@@ -1,0 +1,58 @@
+extends ../layout
+
+block content
+  .d-flex.justify-content-between.align-items-center.mb-4
+    h2 Lista de Tareas
+    a.btn.btn-success(href='/tasks/new') Nueva Tarea
+
+  // Filters
+  .card.mb-4
+    .card-body
+      form.row.g-3(action='/tasks', method='GET')
+        .col-md-3
+          select.form-select(name='state')
+            option(value='') Estado (Todos)
+            option(value='pendiente', selected=filters.state === 'pendiente') Pendiente
+            option(value='en proceso', selected=filters.state === 'en proceso') En Proceso
+            option(value='finalizada', selected=filters.state === 'finalizada') Finalizada
+        .col-md-3
+          select.form-select(name='priority')
+            option(value='') Prioridad (Todas)
+            option(value='alta', selected=filters.priority === 'alta') Alta
+            option(value='media', selected=filters.priority === 'media') Media
+            option(value='baja', selected=filters.priority === 'baja') Baja
+        .col-md-3
+          select.form-select(name='employeeId')
+            option(value='') Empleado (Todos)
+            each emp in employees
+              option(value=emp.id, selected=filters.employeeId === emp.id)= emp.name
+        .col-md-3
+          button.btn.btn-primary.w-100(type='submit') Filtrar
+          a.btn.btn-outline-secondary.w-100.mt-2(href='/tasks') Limpiar
+
+  if tasks.length
+    table.table.table-striped.table-hover
+      thead
+        tr
+          th Tarea
+          th Prioridad
+          th Estado
+          th Asignado a
+          th Acciones
+      tbody
+        each task in tasks
+          tr
+            td= task.description
+            td
+              span.badge(class=`bg-${task.priority === 'alta' ? 'danger' : task.priority === 'media' ? 'warning' : 'info'}`)= task.priority
+            td
+              span.badge(class=`bg-${task.state === 'finalizada' ? 'success' : task.state === 'en proceso' ? 'primary' : 'secondary'}`)= task.state
+            td
+              - const assigned = employees.find(e => e.id === task.assignedTo)
+              = assigned ? assigned.name : 'Sin asignar'
+            td
+              a.btn.btn-sm.btn-warning.me-2(href=`/tasks/${task.id}/edit`) Editar
+              form.d-inline(action=`/tasks/${task.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Estás seguro?');")
+                button.btn.btn-sm.btn-danger(type='submit') Eliminar
+  else
+    p.text-center.text-muted No hay tareas que coincidan con los filtros.

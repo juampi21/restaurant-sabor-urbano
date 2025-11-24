@@ -1,0 +1,25 @@
+extends ../layout
+
+block content
+  h2.mb-4= title
+  form(action=employee ? `/employees/${employee.id}?_method=PUT` : '/employees', method='POST')
+    .mb-3
+      label.form-label(for='name') Nombre Completo
+      input#name.form-control(type='text', name='name', value=employee ? employee.name : '', required)
+    
+    .mb-3
+      label.form-label(for='role') Rol
+      select#role.form-select(name='role', required)
+        option(value='') Seleccionar Rol
+        each role in roles
+          option(value=role, selected=employee && employee.role === role)= role
+    
+    .mb-3
+      label.form-label(for='area') Área
+      select#area.form-select(name='area', required)
+        option(value='') Seleccionar Área
+        each area in areas
+          option(value=area, selected=employee && employee.area === area)= area
+
+    button.btn.btn-primary(type='submit') Guardar
+    a.btn.btn-secondary.ms-2(href='/employees') Cancelar

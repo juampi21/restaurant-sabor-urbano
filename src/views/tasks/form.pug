@@ -1,0 +1,37 @@
+extends ../layout
+
+block content
+  h2.mb-4= title
+  form(action=task ? `/tasks/${task.id}?_method=PUT` : '/tasks', method='POST')
+    .mb-3
+      label.form-label(for='description') Descripción de la Tarea
+      input#description.form-control(type='text', name='description', value=task ? task.description : '', required)
+    
+    .row
+      .col-md-6.mb-3
+        label.form-label(for='priority') Prioridad
+        select#priority.form-select(name='priority', required)
+          option(value='baja', selected=task && task.priority === 'baja') Baja
+          option(value='media', selected=task && task.priority === 'media') Media
+          option(value='alta', selected=task && task.priority === 'alta') Alta
+      
+      .col-md-6.mb-3
+        label.form-label(for='state') Estado
+        select#state.form-select(name='state', required)
+          option(value='pendiente', selected=task && task.state === 'pendiente') Pendiente
+          option(value='en proceso', selected=task && task.state === 'en proceso') En Proceso
+          option(value='finalizada', selected=task && task.state === 'finalizada') Finalizada
+
+    .mb-3
+      label.form-label(for='assignedTo') Asignar a Empleado
+      select#assignedTo.form-select(name='assignedTo')
+        option(value='') Seleccionar Empleado
+        each emp in employees
+          option(value=emp.id, selected=task && task.assignedTo === emp.id)= emp.name
+
+    .mb-3
+      label.form-label(for='observations') Observaciones
+      textarea#observations.form-control(name='observations', rows='3')= task ? task.observations : ''
+
+    button.btn.btn-primary(type='submit') Guardar
+    a.btn.btn-secondary.ms-2(href='/tasks') Cancelar

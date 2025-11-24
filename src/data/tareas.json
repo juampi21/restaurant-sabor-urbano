@@ -1,0 +1,11 @@
+[
+  {
+    "id": "427c949f-3623-4eb1-a92e-df26679dd44e",
+    "description": "Limpiar cocina",
+    "priority": "media",
+    "state": "pendiente",
+    "assignedTo": "ca550102-d33e-4a13-a445-7e305f65f9b0",
+    "observations": "",
+    "createdAt": "2025-11-24T05:08:05.275Z"
+  }
+]
