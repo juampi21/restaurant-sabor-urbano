@@ -31,28 +31,60 @@ block content
           a.btn.btn-outline-secondary.w-100.mt-2(href='/tasks') Limpiar
 
   if tasks.length
-    table.table.table-striped.table-hover
-      thead
-        tr
-          th Tarea
-          th Prioridad
-          th Estado
-          th Asignado a
-          th Acciones
-      tbody
-        each task in tasks
+    .table-responsive(style='max-height: 600px; overflow-y: auto;')
+      table.table.table-striped.table-hover
+        thead(style='position: sticky; top: 0; background-color: white; z-index: 1;')
           tr
-            td= task.description
-            td
-              span.badge(class=`bg-${task.priority === 'alta' ? 'danger' : task.priority === 'media' ? 'warning' : 'info'}`)= task.priority
-            td
-              span.badge(class=`bg-${task.state === 'finalizada' ? 'success' : task.state === 'en proceso' ? 'primary' : 'secondary'}`)= task.state
-            td
-              - const assigned = employees.find(e => e.id === task.assignedTo)
-              = assigned ? assigned.name : 'Sin asignar'
-            td
-              a.btn.btn-sm.btn-warning.me-2(href=`/tasks/${task.id}/edit`) Editar
-              form.d-inline(action=`/tasks/${task.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Estás seguro?');")
-                button.btn.btn-sm.btn-danger(type='submit') Eliminar
+            th Tarea
+            th Prioridad
+            th Estado
+            th Asignado a
+            th Acciones
+        tbody
+          each task in tasks
+            tr(class=task.state === 'finalizada' ? 'table-secondary text-muted' : '')
+              td= task.description
+              td
+                span.badge(class=`bg-${task.priority === 'alta' ? 'danger' : task.priority === 'media' ? 'warning' : 'info'}`)= task.priority
+              td
+                span.badge(class=`bg-${task.state === 'finalizada' ? 'success' : task.state === 'verificacion' ? 'info' : task.state === 'en proceso' ? 'primary' : 'secondary'}`)
+                  if task.state === 'verificacion'
+                    = user.role === 'admin' ? 'Completada' : 'En Revisión'
+                  else
+                    = task.state
+              td
+                - const assigned = employees.find(e => e.id.toString() === (task.assignedTo ? task.assignedTo.toString() : ''))
+                = assigned ? assigned.name : 'Sin asignar'
+              td
+                if task.state !== 'finalizada'
+                  if task.state === 'verificacion'
+                    if user.role === 'admin'
+                      form.d-inline(action=`/tasks/${task.id}/complete`, method='POST')
+                        button.btn.btn-sm.btn-success.me-2(type='submit', title='Aprobar y Finalizar')
+                          i.bi.bi-check-all Aprobar
+                    else
+                      //- Nada para el empleado en acciones cuando está en verificación
+                  else
+                    //- Estado Pendiente o En Proceso
+                    if user.role === 'admin'
+                      //- Admin solo puede finalizar sus propias tareas (o de otros admins)
+                      - const isAssignedToAdmin = assigned && assigned.role === 'Administrador/a'
+                      if isAssignedToAdmin
+                        form.d-inline(action=`/tasks/${task.id}/complete`, method='POST')
+                          button.btn.btn-sm.btn-danger.me-2(type='submit', title='Marcar como finalizada')
+                            i.bi.bi-check-lg Finalizar
+                    else
+                      //- Empleado ve botón Finalizar
+                      form.d-inline(action=`/tasks/${task.id}/complete`, method='POST')
+                        button.btn.btn-sm.btn-danger.me-2(type='submit', title='Finalizar')
+                          i.bi.bi-check-lg Finalizar
+                if user.role === 'admin'
+                  if task.state !== 'finalizada'
+                    a.btn.btn-sm.btn-warning.me-2(href=`/tasks/${task.id}/edit`) Editar
+                  form.d-inline(action=`/tasks/${task.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Estás seguro?');")
+                    button.btn.btn-sm.btn-outline-danger(type='submit') Eliminar
   else
     p.text-center.text-muted No hay tareas que coincidan con los filtros.
+
+  .text-center.mt-4
+    a.btn.btn-outline-secondary(href='/') Volver al Inicio

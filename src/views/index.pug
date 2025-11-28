@@ -2,7 +2,57 @@ extends layout
 
 block content
   .p-5.mb-4.bg-light.rounded-3
-    .container-fluid.py-5
-      h1.display-5.fw-bold Sabor Urbano - Gestión Interna
-      p.col-md-8.fs-4 Sistema integral de gestión de pedidos, inventario y personal.
-      a.btn.btn-primary.btn-lg(href='/tasks') Ver Tareas
+    .container-fluid.py-5.text-center
+      h1.display-5.fw-bold= user && user.role === 'admin' ? 'Panel de Administrador' : 'Sabor Urbano'
+      if user
+        h2.mb-4.text-muted Hola, #{user.username}
+      
+      // Dashboard Stats
+      .row.mb-5.justify-content-center
+        .mb-3(class=user && user.role === 'admin' ? 'col-md-3' : 'col-md-4')
+          a.text-decoration-none(href='/orders?status=pendiente')
+            .card.text-white.bg-warning.h-100.shadow-sm
+              .card-header.fw-bold Pedidos Pendientes
+              .card-body
+                h1.display-4= pendingOrdersCount
+                p.card-text Pedidos por entregar
+        .mb-3(class=user && user.role === 'admin' ? 'col-md-3' : 'col-md-4')
+          a.text-decoration-none(href='/inventory?lowStock=true')
+            .card.text-white.bg-danger.h-100.shadow-sm
+              .card-header.fw-bold Stock Bajo
+              .card-body
+                h1.display-4= lowStockCount
+                p.card-text Insumos por reponer
+        .mb-3(class=user && user.role === 'admin' ? 'col-md-3' : 'col-md-4')
+          a.text-decoration-none(href='/tasks?state=pendiente')
+            .card.text-white.bg-info.h-100.shadow-sm
+              .card-header.fw-bold Tareas Pendientes
+              .card-body
+                h1.display-4= pendingTasksCount
+                p.card-text Tareas sin finalizar
+        if user && user.role === 'admin'
+          .col-md-3.mb-3
+            a.text-decoration-none(href='/tasks?state=verificacion')
+              .card.text-white.bg-primary.h-100.shadow-sm
+                .card-header.fw-bold En Revisión
+                .card-body
+                  h1.display-4= verificationTasksCount
+                  p.card-text Tareas esperando aprobación
+
+
+
+      p.fs-4.mb-4.text-muted Accesos Rápidos
+      div.d-grid.gap-2.col-md-6.mx-auto
+        a.btn.btn-primary.btn-lg(href='/tasks') 
+          i.bi.bi-list-check.me-2
+          | Gestión de Tareas
+        a.btn.btn-success.btn-lg(href='/inventory') 
+          i.bi.bi-box-seam.me-2
+          | Control de Inventario
+        a.btn.btn-warning.btn-lg(href='/orders') 
+          i.bi.bi-cart-check.me-2
+          | Gestión de Pedidos
+        if user && user.role === 'admin'
+          a.btn.btn-secondary.btn-lg(href='/employees') 
+            i.bi.bi-people.me-2
+            | Administración de Empleados

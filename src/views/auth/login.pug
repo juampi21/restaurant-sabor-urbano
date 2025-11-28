@@ -1,22 +1,26 @@
 extends ../layout
 
 block content
-  .row.justify-content-center
-    .col-md-6
-      .card.mt-5
-        .card-header.text-center
-          h3 Iniciar Sesión
-        .card-body
-          if error
-            .alert.alert-danger= error
-          form(action='/auth/login', method='POST')
-            .mb-3
-              label.form-label(for='username') Usuario
-              input#username.form-control(type='text', name='username', required)
-            .mb-3
-              label.form-label(for='password') Contraseña
-              input#password.form-control(type='password', name='password', required)
-            button.btn.btn-primary.w-100(type='submit') Ingresar
+  .row.justify-content-center.align-items-center(style='min-height: 80vh;')
+    .col-md-4
+      .card.shadow-lg.border-0.rounded-3
+        .card-body.p-5
+          .text-center.mb-4
+            h2.fw-bold.text-primary Sabor Urbano
+            p.text-muted Iniciar Sesión
           
-          .mt-3.text-center
-            a(href='/auth/register') ¿No tienes cuenta? Regístrate
+          if error
+            .alert.alert-danger.rounded-3= error
+            
+          form(action='/auth/login', method='POST')
+            .form-floating.mb-3
+              input#username.form-control(type='text', name='username', placeholder='Usuario', required)
+              label(for='username') Usuario
+            .form-floating.mb-4
+              input#password.form-control(type='password', name='password', placeholder='Contraseña', required)
+              label(for='password') Contraseña
+            button.btn.btn-primary.w-100.btn-lg.rounded-3(type='submit') Ingresar
+          
+          .mt-4.text-center
+            p.mb-0 ¿No tienes cuenta? 
+              a.text-decoration-none(href='/auth/register') Regístrate

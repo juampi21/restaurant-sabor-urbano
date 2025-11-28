@@ -3,42 +3,47 @@ extends ../layout
 block content
   h2.mb-4 Gestión de Pedidos
   
-  .card.mb-4
-    .card-header
-      h3.h5.mb-0 Nuevo Pedido
-    .card-body
-      form(action='/orders', method='POST')
-        .row.mb-3
-          .col-md-6
-            label.form-label Cliente
-            input.form-control(type='text', name='clientName', placeholder='Nombre del Cliente', required)
-          .col-md-6
-            label.form-label Plataforma
-            select.form-select(name='platform', required)
-              option(value='Local') Local / Presencial
-              option(value='Telefono') Telefónico
-              option(value='Rappi') Rappi
-              option(value='PedidosYa') PedidosYa
-              option(value='Propia') App Propia
-        
-        .mb-3
-          label.form-label Productos / Detalle
-          textarea.form-control(name='products', rows='2', placeholder='Ej: 2 Hamburguesas completas, 1 Coca-Cola', required)
+  if !filters || !filters.status
+    .card.mb-4
+      .card-header
+        h3.h5.mb-0 Nuevo Pedido
+      .card-body
+        form(action='/orders', method='POST')
+          .row.mb-3
+            .col-md-6
+              label.form-label Cliente
+              input.form-control(type='text', name='clientName', placeholder='Nombre del Cliente', required)
+            .col-md-6
+              label.form-label Dirección / Mesa
+              input.form-control(type='text', name='address', placeholder='Dirección o Mesa')
+            .col-md-6
+              label.form-label Plataforma
+              select.form-select(name='platform', required)
+                option(value='Local') Local / Presencial
+                option(value='Telefono') Telefónico
+                option(value='Rappi') Rappi
+                option(value='PedidosYa') PedidosYa
+                option(value='Propia') App Propia
+          
+          .mb-3
+            label.form-label Productos / Detalle
+            textarea.form-control(name='products', rows='2', placeholder='Ej: 2 Hamburguesas completas, 1 Coca-Cola', required)
 
-        .row.mb-3
-          .col-md-4
-            label.form-label Total ($)
-            input.form-control(type='number', name='total', placeholder='0.00', required)
-          .col-md-8.d-flex.align-items-end
-            button.btn.btn-primary.w-100(type='submit') Registrar Pedido
+          .row.mb-3
+            .col-md-4
+              label.form-label Total ($)
+              input.form-control(type='number', name='total', placeholder='0.00', required)
+            .col-md-8.d-flex.align-items-end
+              button.btn.btn-primary(type='submit') Registrar Pedido
 
   if pedidos.length
-    .table-responsive
+    .table-responsive(style='max-height: 600px; overflow-y: auto;')
       table.table.table-striped.table-hover
-        thead
+        thead(style='position: sticky; top: 0; background-color: white; z-index: 1;')
           tr
             th Fecha
             th Cliente
+            th Dirección / Mesa
             th Plataforma
             th Detalle
             th Total
@@ -47,9 +52,10 @@ block content
               th Acciones
         tbody
           each pedido in pedidos
-            tr
+            tr(class=pedido.status === 'completado' ? 'table-secondary text-muted' : '')
               td= new Date(pedido.createdAt).toLocaleDateString()
               td= pedido.clientName
+              td= pedido.address || '-'
               td
                 span.badge.bg-secondary= pedido.platform
               td= pedido.products
@@ -58,7 +64,15 @@ block content
                 span.badge(class=`bg-${pedido.status === 'pendiente' ? 'warning' : 'success'}`)= pedido.status
               if user.role === 'admin'
                 td
-                  form(action=`/orders/${pedido.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Eliminar pedido?');")
-                    button.btn.btn-sm.btn-danger(type='submit') Eliminar
+                  if pedido.status !== 'completado'
+                    form.d-inline(action=`/orders/${pedido.id}/complete`, method='POST')
+                      button.btn.btn-sm.btn-danger.me-2(type='submit', title='Marcar como finalizado')
+                        i.bi.bi-check-lg Finalizar
+                    a.btn.btn-sm.btn-warning.me-2(href=`/orders/${pedido.id}/edit`) Editar
+                  form.d-inline(action=`/orders/${pedido.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Eliminar pedido?');")
+                    button.btn.btn-sm.btn-outline-danger(type='submit') Eliminar
   else
     p.text-center.text-muted No hay pedidos registrados.
+
+  .text-center.mt-4
+    a.btn.btn-outline-secondary(href='/') Volver al Inicio

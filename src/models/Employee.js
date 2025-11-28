@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Esquema de Mongoose para Empleados
 const employeeSchema = new mongoose.Schema({
     name: { type: String, required: true },
     role: { type: String, required: true },

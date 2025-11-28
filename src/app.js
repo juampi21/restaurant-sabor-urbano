@@ -12,7 +12,7 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Middlewares de configuración
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,39 +20,37 @@ app.use(cookieParser());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// View Engine
+// Configuración del motor de vistas
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-// Routes
+// Importación de rutas
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const dashboardController = require('./controllers/dashboardController');
 
-// Public Routes
+// Rutas públicas
 app.use('/auth', authRoutes);
 
-// Protected Routes (Middleware applied in routes or globally here if preferred)
-app.get('/', (req, res) => {
-    if (!req.cookies.token) {
-        return res.redirect('/auth/login');
-    }
-    res.render('index', { title: 'Sabor Urbano', user: true });
-});
+const { protect } = require('./middleware/authMiddleware');
+
+// Rutas protegidas
+app.get('/', protect, dashboardController.getDashboard);
 
 app.use('/employees', employeeRoutes);
 app.use('/tasks', taskRoutes);
 app.use('/inventory', inventoryRoutes);
 app.use('/orders', orderRoutes);
 
-// Start Server
+// Iniciar servidor
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 
-// Error Handling Middleware
+// Middleware de manejo de errores
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Algo salió mal!');

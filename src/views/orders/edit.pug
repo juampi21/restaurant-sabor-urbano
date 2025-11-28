@@ -1,0 +1,35 @@
+extends ../layout
+
+block content
+  h2.mb-4 Editar Pedido
+  
+  .card
+    .card-body
+      form(action=`/orders/${pedido.id}?_method=PUT`, method='POST')
+        .row.mb-3
+          .col-md-6
+            label.form-label(for='clientName') Cliente
+            input#clientName.form-control(type='text', name='clientName', value=pedido.clientName, required)
+          .col-md-6
+            label.form-label(for='address') Dirección / Mesa
+            input#address.form-control(type='text', name='address', value=pedido.address)
+          .col-md-6
+            label.form-label(for='platform') Plataforma
+            select#platform.form-select(name='platform', required)
+              option(value='Local', selected=pedido.platform === 'Local') Local / Presencial
+              option(value='Telefono', selected=pedido.platform === 'Telefono') Telefónico
+              option(value='Rappi', selected=pedido.platform === 'Rappi') Rappi
+              option(value='PedidosYa', selected=pedido.platform === 'PedidosYa') PedidosYa
+              option(value='Propia', selected=pedido.platform === 'Propia') App Propia
+        
+        .mb-3
+          label.form-label(for='products') Productos / Detalle
+          textarea#products.form-control(name='products', rows='2', required)= pedido.products
+
+        .row.mb-3
+          .col-md-4
+            label.form-label(for='total') Total ($)
+            input#total.form-control(type='number', name='total', value=pedido.total, required)
+
+        button.btn.btn-primary(type='submit') Actualizar Pedido
+        a.btn.btn-secondary.ms-2(href='/orders') Cancelar

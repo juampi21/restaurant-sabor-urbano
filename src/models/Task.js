@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Esquema de Mongoose para Tareas
 const taskSchema = new mongoose.Schema({
     description: { type: String, required: true },
     priority: {
@@ -9,7 +10,7 @@ const taskSchema = new mongoose.Schema({
     },
     state: {
         type: String,
-        enum: ['pendiente', 'en proceso', 'finalizada'],
+        enum: ['pendiente', 'en proceso', 'verificacion', 'finalizada'],
         default: 'pendiente'
     },
     assignedTo: {

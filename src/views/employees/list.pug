@@ -7,24 +7,28 @@ block content
       a.btn.btn-success(href='/employees/new') Nuevo Empleado
 
   if employees.length
-    table.table.table-striped.table-hover
-      thead
-        tr
-          th Nombre
-          th Rol
-          th Área
-          if user.role === 'admin'
-            th Acciones
-      tbody
-        each employee in employees
+    .table-responsive(style='max-height: 600px; overflow-y: auto;')
+      table.table.table-striped.table-hover
+        thead(style='position: sticky; top: 0; background-color: white; z-index: 1;')
           tr
-            td= employee.name
-            td= employee.role
-            td= employee.area
+            th Nombre
+            th Rol
+            th Área
             if user.role === 'admin'
-              td
-                a.btn.btn-sm.btn-warning.me-2(href=`/employees/${employee.id}/edit`) Editar
-                form.d-inline(action=`/employees/${employee.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Estás seguro?');")
-                  button.btn.btn-sm.btn-danger(type='submit') Eliminar
+              th Acciones
+        tbody
+          each employee in employees
+            tr
+              td= employee.name
+              td= employee.role
+              td= employee.area
+              if user.role === 'admin'
+                td
+                  a.btn.btn-sm.btn-warning.me-2(href=`/employees/${employee.id}/edit`) Editar
+                  form.d-inline(action=`/employees/${employee.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Estás seguro?');")
+                    button.btn.btn-sm.btn-outline-danger(type='submit') Eliminar
   else
     p.text-center.text-muted No hay empleados registrados.
+
+  .text-center.mt-5
+    a.btn.btn-outline-secondary(href='/') Volver al Inicio

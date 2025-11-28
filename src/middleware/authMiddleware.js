@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Middleware para proteger rutas verificando el token JWT
 exports.protect = async (req, res, next) => {
     let token;
     if (req.cookies.token) {
@@ -14,7 +15,7 @@ exports.protect = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = await User.findById(decoded.id);
-        res.locals.user = req.user; // Make user available in views
+        res.locals.user = req.user; // Hacer disponible el usuario en las vistas
         next();
     } catch (error) {
         res.clearCookie('token');
@@ -22,6 +23,7 @@ exports.protect = async (req, res, next) => {
     }
 };
 
+// Middleware para autorizar acceso basado en roles
 exports.authorize = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {

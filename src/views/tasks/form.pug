@@ -27,7 +27,7 @@ block content
       select#assignedTo.form-select(name='assignedTo')
         option(value='') Seleccionar Empleado
         each emp in employees
-          option(value=emp.id, selected=task && task.assignedTo === emp.id)= emp.name
+          option(value=emp.id, selected=task && task.assignedTo && task.assignedTo.toString() === emp.id.toString())= `${emp.name} - ${emp.role}`
 
     .mb-3
       label.form-label(for='observations') Observaciones

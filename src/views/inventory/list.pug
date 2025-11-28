@@ -3,38 +3,50 @@ extends ../layout
 block content
   h2.mb-4 Control de Inventario
   
-  .card.mb-4
-    .card-header
-      h3.h5.mb-0 Nuevo Insumo
-    .card-body
-      form.row.g-2(action='/inventory/supplies', method='POST')
-        .col-md-5
-          input.form-control(type='text', name='name', placeholder='Nombre (ej. Tomates)', required)
-        .col-md-3
-          input.form-control(type='number', name='quantity', placeholder='Cantidad', required, min='0')
-        .col-md-2
-          input.form-control(type='text', name='unit', placeholder='Unidad (kg, u)', required)
-        .col-md-2
-          button.btn.btn-primary.w-100(type='submit') Agregar
+  if filters && filters.lowStock
+    .alert.alert-warning.d-flex.justify-content-between.align-items-center
+      span
+        i.bi.bi-exclamation-triangle-fill.me-2
+        strong Stock Bajo:
+        |  Mostrando insumos con menos de 10 unidades o 10 kilos.
+      a.btn.btn-sm.btn-outline-dark(href='/inventory') Mostrar Todos
+  else
+    .card.mb-4
+      .card-header
+        h3.h5.mb-0 Nuevo Insumo
+      .card-body
+        form.row.g-2(action='/inventory/supplies', method='POST')
+          .col-md-5
+            input.form-control(type='text', name='name', placeholder='Nombre (ej. Tomates)', required)
+          .col-md-3
+            input.form-control(type='number', name='quantity', placeholder='Cantidad', required, min='0')
+          .col-md-2
+            input.form-control(type='text', name='unit', placeholder='Unidad (kg, u)', required)
+          .col-md-2
+            button.btn.btn-primary.w-100(type='submit') Agregar
 
   if insumos.length
-    table.table.table-striped.table-hover
-      thead
-        tr
-          th Insumo
-          th Cantidad
-          th Unidad
-          if user.role === 'admin'
-            th Acciones
-      tbody
-        each item in insumos
+    .table-responsive(style='max-height: 600px; overflow-y: auto;')
+      table.table.table-striped.table-hover
+        thead(style='position: sticky; top: 0; background-color: white; z-index: 1;')
           tr
-            td= item.name
-            td= item.quantity
-            td= item.unit
-            if user.role === 'admin'
+            th Insumo
+            th Cantidad
+            th Unidad
+            th Acciones
+        tbody
+          each item in insumos
+            tr
+              td= item.name
+              td= item.quantity
+              td= item.unit
               td
-                form(action=`/inventory/supplies/${item.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Eliminar insumo?');")
-                  button.btn.btn-sm.btn-danger(type='submit') Eliminar
+                a.btn.btn-sm.btn-warning.me-2(href=`/inventory/supplies/${item.id}/edit`) Editar
+                if user.role === 'admin'
+                  form.d-inline(action=`/inventory/supplies/${item.id}?_method=DELETE`, method='POST', onsubmit="return confirm('¿Eliminar insumo?');")
+                    button.btn.btn-sm.btn-outline-danger(type='submit') Eliminar
   else
     p.text-center.text-muted No hay insumos registrados.
+
+  .text-center.mt-4
+    a.btn.btn-outline-secondary(href='/') Volver al Inicio

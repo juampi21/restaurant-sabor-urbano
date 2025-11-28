@@ -17,8 +17,9 @@ html
                 a.nav-link(href='/tasks') Tareas
               li.nav-item
                 a.nav-link(href='/orders') Pedidos
-              li.nav-item
-                a.nav-link(href='/employees') Empleados
+              if user.role === 'admin'
+                li.nav-item
+                  a.nav-link(href='/employees') Empleados
               li.nav-item
                 a.nav-link(href='/inventory') Inventario
               li.nav-item
